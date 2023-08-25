@@ -16,7 +16,8 @@ That's it.
 ## Installation
 
 If you are using Emacs 29.1, execute the following command:
-`(package-vc-install "https://github.com/dolmens/eglot-hierarchy")`.
+
+`(package-vc-install "https://github.com/dolmens/eglot-hierarchy")`
 
 Alternatively, you can download the `eglot-hierarchy.el` file and
 load it somehow.
