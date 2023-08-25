@@ -174,7 +174,7 @@ With a prefix argument, show the outgoing call hierarchy."
       hierarchy
       (lambda (node _)
 	(eglot--dbind
-	    (name direction uri range) node
+	    (name direction uri selectionRange) node
 	  (insert-text-button
 	   name
 	   :type 'eglot-hierarchy-file-button
@@ -185,7 +185,7 @@ With a prefix argument, show the outgoing call hierarchy."
 	       (when w (select-window w)))
 	     (eglot-hierarchy--open-file-in-mru (eglot--uri-to-path uri))
 	     (goto-char (eglot--lsp-position-to-point
-			 (plist-get range :start)))))))
+			 (plist-get selectionRange :start)))))))
       (get-buffer-create eglot-hierarchy-buffer-name)))
 
     ;; hierarchy.el doesn't have an :open property,
