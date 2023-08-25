@@ -42,6 +42,7 @@
 (defconst eglot-hierarchy-super 1)
 (defconst eglot-hierarchy-both 2)
 
+;;;###autoload
 (defun eglot-hierarchy-type-hierarchy (direction)
   "Show the type hierarchy for the symbol at point.
 With prefix 0 show sub-types.
@@ -135,6 +136,7 @@ With prefix 2 show both which is default."
   (select-window (get-mru-window (selected-frame) nil :not-selected))
   (find-file file))
 
+;;;###autoload
 (defun eglot-hierarchy-call-hierarchy (outgoing)
   "Show the incoming call hierarchy for the symbol at point.
 With a prefix argument, show the outgoing call hierarchy."
