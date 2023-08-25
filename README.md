@@ -13,6 +13,9 @@ generate type and call hierarchy.
  
 That's it.
 
+## Details
+Some LSP servers may require you to open a file in order to retrieve the class or calling hierarchy of a type within it, while others may not.   
+
 ## Installation
 
 If you are using Emacs 29.1, execute the following command:
