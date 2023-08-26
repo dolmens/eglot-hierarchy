@@ -36,7 +36,7 @@
   'follow-link t                        ; Click via mouse
   'face 'default)
 
-(defconst eglot-hierarchy-buffer-name "*GLOT LSP Hierarchy*")
+(defconst eglot-hierarchy-buffer-name "*EGLOT LSP Hierarchy*")
 
 (defconst eglot-hierarchy-sub 0)
 (defconst eglot-hierarchy-super 1)
@@ -156,12 +156,12 @@ With a prefix argument, show the outgoing call hierarchy."
      nil
      (lambda (node)
        (condition-case err
-	   (let ((resp (jsonrpc-request eglot-current-server
-					(if outgoing
-					    :callHierarchy/outgoingCalls
-					  :callHierarchy/incomingCalls)
-					`(:item ,node))))
-	     (seq-map (lambda (item) (plist-get item :from)) resp))
+	   (let* ((method (if outgoing :callHierarchy/outgoingCalls
+			    :callHierarchy/incomingCalls))
+		  (tag (if outgoing :to :from))
+		  (resp (jsonrpc-request eglot-current-server method
+					 `(:item ,node))))
+	     (seq-map (lambda (item) (plist-get item tag)) resp))
 	 (jsonrpc-error
 	  (eglot--message "%s" (alist-get 'jsonrpc-error-message (cdr err)))
 	  (eglot-clear-status eglot-current-server) nil)))
