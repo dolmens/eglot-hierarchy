@@ -192,3 +192,6 @@ With a prefix argument, show the outgoing call hierarchy."
     ;; so we open the first level by a click.
     (goto-char (point-min))
     (widget-button-press (point))))
+
+(provide 'eglot-hierarchy)
+;;; eglot-hierarchy.el ends here
