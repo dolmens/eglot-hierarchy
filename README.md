@@ -18,9 +18,13 @@ Some LSP servers may require you to open a file in order to retrieve the class o
 
 ## Installation
 
-If you are using Emacs 29.1, execute the following command:
+If you are using Emacs 29.1, issue the following command:
 
 `(package-vc-install "https://github.com/dolmens/eglot-hierarchy")`
 
 Alternatively, you can download the `eglot-hierarchy.el` file and
 load it somehow.
+
+## Customs
+
+There is a custom variable `eglot-hierarchy-call-site`, if set to t, then clicking the hierarchy item will navigate to the first call site instead of the function start.

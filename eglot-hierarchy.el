@@ -32,6 +32,16 @@
 (require 'eglot)
 (require 'hierarchy)
 
+(defgroup eglot-hierarchy nil
+  "eglot-hierarchy custom settings"
+  :prefix "eglot-hierarchy-"
+  :group 'eglot)
+
+(defcustom eglot-hierarchy-call-site nil
+  "If t, clicking the hierarchy item will navigate to
+the first call site instead of the function start."
+  :type 'boolean)
+
 (define-button-type 'eglot-hierarchy-file-button
   'follow-link t                        ; Click via mouse
   'face 'default)
@@ -147,21 +157,25 @@ With a prefix argument, show the outgoing call hierarchy."
 		eglot-current-server
 		:textDocument/prepareCallHierarchy
 		(eglot--TextDocumentPositionParams)))
+	 (root-nodes (seq-map (lambda (node) `(:item ,node)) root))
 	 (hierarchy (hierarchy-new)))
     (when (= (length root) 0)
       (eglot--error "Not in calling hierarchy under point"))
     (hierarchy-add-trees
      hierarchy
-     root
+     root-nodes
      nil
      (lambda (node)
        (condition-case err
 	   (let* ((method (if outgoing :callHierarchy/outgoingCalls
 			    :callHierarchy/incomingCalls))
 		  (tag (if outgoing :to :from))
+		  (node-item (plist-get node :item))
 		  (resp (jsonrpc-request eglot-current-server method
-					 `(:item ,node))))
-	     (seq-map (lambda (item) (plist-get item tag)) resp))
+					 `(:item ,node-item))))
+	     (seq-map (lambda (item) `(:item ,(plist-get item tag)
+					     :fromRanges ,(plist-get item :fromRanges)))
+		      resp))
 	 (jsonrpc-error
 	  (eglot--message "%s" (alist-get 'jsonrpc-error-message (cdr err)))
 	  (eglot-clear-status eglot-current-server) nil)))
@@ -174,7 +188,7 @@ With a prefix argument, show the outgoing call hierarchy."
       hierarchy
       (lambda (node _)
 	(eglot--dbind
-	    (name direction uri selectionRange) node
+	    (name direction uri selectionRange) (plist-get node :item)
 	  (insert-text-button
 	   name
 	   :type 'eglot-hierarchy-file-button
@@ -184,8 +198,14 @@ With a prefix argument, show the outgoing call hierarchy."
 	     (let ((w (get-buffer-window (marker-buffer btn))))
 	       (when w (select-window w)))
 	     (eglot-hierarchy--open-file-in-mru (eglot--uri-to-path uri))
-	     (goto-char (eglot--lsp-position-to-point
-			 (plist-get selectionRange :start)))))))
+	     (let* ((fromRanges (plist-get node :fromRanges))
+		    (range (if (and eglot-hierarchy-call-site
+				    (vectorp fromRanges)
+				    (> (length fromRanges) 0))
+			       (aref fromRanges 0)
+			     selectionRange)))
+	       (goto-char (eglot--lsp-position-to-point
+			   (plist-get range :start))))))))
       (get-buffer-create eglot-hierarchy-buffer-name)))
 
     ;; hierarchy.el doesn't have an :open property,
